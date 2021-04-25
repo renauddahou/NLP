@@ -16,4 +16,6 @@
 5. N-gram model (Statistical model)
 
 
+#projects
 
+1. Resume parser (Using information retrieval techniques)
