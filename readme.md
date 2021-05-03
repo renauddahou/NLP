@@ -18,4 +18,6 @@
 
 #projects
 
-1. Resume parser (Using information retrieval techniques)
+1. Resume parser app (Using information retrieval techniques)
+  stacks - Spacy matcher,classification model with bert 
+   
