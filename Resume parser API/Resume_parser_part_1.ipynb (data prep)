@@ -1,0 +1,581 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Resume parser - part 1",
+      "provenance": [],
+      "collapsed_sections": [],
+      "toc_visible": true,
+      "authorship_tag": "ABX9TyOjMj9tDi6NRUQji5W9cu84",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/zyberg2091/100-days-of-NLP/blob/master/Resume%20parser%20API/Resume_parser_part_1.ipynb%20(data%20prep)\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "mcAhjRCtl3Hf"
+      },
+      "source": [
+        "## preparation and structuring Dataset \n",
+        "\n",
+        "### resume data"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NzvsoTlH7mWT",
+        "outputId": "cb50a163-1d11-4f36-e58e-f5f9415d9be6"
+      },
+      "source": [
+        "!pip install tika\n",
+        "from tika import parser # pip install tika"
+      ],
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: tika in /usr/local/lib/python3.7/dist-packages (1.24)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.7/dist-packages (from tika) (56.0.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.7/dist-packages (from tika) (2.23.0)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.7/dist-packages (from requests->tika) (1.24.3)\n",
+            "Requirement already satisfied: chardet<4,>=3.0.2 in /usr/local/lib/python3.7/dist-packages (from requests->tika) (3.0.4)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.7/dist-packages (from requests->tika) (2020.12.5)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.7/dist-packages (from requests->tika) (2.10)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jGQOXqMr9rPp",
+        "outputId": "1cad7984-0f1d-4251-ff9e-b478b2bb0123"
+      },
+      "source": [
+        "!pip install spacy"
+      ],
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: spacy in /usr/local/lib/python3.7/dist-packages (2.2.4)\n",
+            "Requirement already satisfied: srsly<1.1.0,>=1.0.2 in /usr/local/lib/python3.7/dist-packages (from spacy) (1.0.5)\n",
+            "Requirement already satisfied: tqdm<5.0.0,>=4.38.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (4.41.1)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.7/dist-packages (from spacy) (56.0.0)\n",
+            "Requirement already satisfied: catalogue<1.1.0,>=0.0.7 in /usr/local/lib/python3.7/dist-packages (from spacy) (1.0.0)\n",
+            "Requirement already satisfied: numpy>=1.15.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (1.19.5)\n",
+            "Requirement already satisfied: thinc==7.4.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (7.4.0)\n",
+            "Requirement already satisfied: plac<1.2.0,>=0.9.6 in /usr/local/lib/python3.7/dist-packages (from spacy) (1.1.3)\n",
+            "Requirement already satisfied: cymem<2.1.0,>=2.0.2 in /usr/local/lib/python3.7/dist-packages (from spacy) (2.0.5)\n",
+            "Requirement already satisfied: wasabi<1.1.0,>=0.4.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (0.8.2)\n",
+            "Requirement already satisfied: blis<0.5.0,>=0.4.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (0.4.1)\n",
+            "Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (1.0.5)\n",
+            "Requirement already satisfied: preshed<3.1.0,>=3.0.2 in /usr/local/lib/python3.7/dist-packages (from spacy) (3.0.5)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.13.0 in /usr/local/lib/python3.7/dist-packages (from spacy) (2.23.0)\n",
+            "Requirement already satisfied: importlib-metadata>=0.20; python_version < \"3.8\" in /usr/local/lib/python3.7/dist-packages (from catalogue<1.1.0,>=0.0.7->spacy) (3.10.1)\n",
+            "Requirement already satisfied: chardet<4,>=3.0.2 in /usr/local/lib/python3.7/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (3.0.4)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.7/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2020.12.5)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.7/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (1.24.3)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.7/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2.10)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.4; python_version < \"3.8\" in /usr/local/lib/python3.7/dist-packages (from importlib-metadata>=0.20; python_version < \"3.8\"->catalogue<1.1.0,>=0.0.7->spacy) (3.7.4.3)\n",
+            "Requirement already satisfied: zipp>=0.5 in /usr/local/lib/python3.7/dist-packages (from importlib-metadata>=0.20; python_version < \"3.8\"->catalogue<1.1.0,>=0.0.7->spacy) (3.4.1)\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "Bl13er_-XqA4"
+      },
+      "source": [
+        "### Extracting data for developer hiring"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "MCo5k8ClS7_z"
+      },
+      "source": [
+        "from spacy.matcher import Matcher\n",
+        "import spacy\n",
+        "\n",
+        "nlp=spacy.load('en_core_web_sm')\n",
+        "matcher=Matcher(nlp.vocab)"
+      ],
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "W9UN8u56ku3M"
+      },
+      "source": [
+        "## buzz words\n",
+        "\n",
+        "#for ai\n",
+        "pattern_1= [{\"LOWER\": \"machine\"}, {\"LOWER\": \"learning\"}]\n",
+        "pattern_2= [{\"LOWER\": \"deep\"}, {\"LOWER\": \"learning\"}]\n",
+        "pattern_3= [{\"LOWER\": \"nlp\"}]\n",
+        "pattern_4= [{\"LOWER\": \"big\"}, {\"LOWER\": \"data\"}]\n",
+        "pattern_5= [{\"LOWER\": \"reinforcement\"}, {\"LOWER\": \"learning\"}]\n",
+        "\n",
+        "#for app dev\n",
+        "pattern_6= [{\"LOWER\": \"android\"}, {\"LOWER\": \"studio\"}]\n",
+        "pattern_7= [{\"LOWER\": \"kotlin\"}]\n",
+        "pattern_8= [{\"LOWER\": \"react-native\"}]\n",
+        "pattern_9= [{\"LOWER\": \"ios\"}]\n",
+        "pattern_16= [{\"LOWER\": \"android\"}]            \n",
+        "#for web dev\n",
+        "\n",
+        "pattern_10= [{\"LOWER\": \"frontend\"}]\n",
+        "pattern_11= [{\"LOWER\": \"backend\"}]\n",
+        "pattern_12= [{\"LOWER\": \"react\"}]\n",
+        "pattern_13= [{\"LOWER\": \"nodejs\"}]\n",
+        "pattern_14= [{\"LOWER\": \"javascript\"}]\n",
+        "pattern_15= [{\"LOWER\": \"HTML\"}]\n",
+        "\n",
+        "matcher.add(\"AI_TEST_PATTERNS_1\",[pattern_1])\n",
+        "matcher.add(\"AI_TEST_PATTERNS_2\",[pattern_2])\n",
+        "matcher.add(\"AI_TEST_PATTERNS_3\",[pattern_3])\n",
+        "matcher.add(\"AI_TEST_PATTERNS_4\",[pattern_4])\n",
+        "matcher.add(\"AI_TEST_PATTERNS_5\",[pattern_5])\n",
+        "matcher.add(\"App_TEST_PATTERNS_6\",[pattern_6])\n",
+        "matcher.add(\"App_TEST_PATTERNS_7\",[pattern_7])\n",
+        "matcher.add(\"App_TEST_PATTERNS_8\",[pattern_8])\n",
+        "matcher.add(\"App_TEST_PATTERNS_9\",[pattern_9])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_10\",[pattern_10])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_11\",[pattern_11])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_12\",[pattern_12])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_13\",[pattern_13])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_14\",[pattern_14])\n",
+        "matcher.add(\"wb_TEST_PATTERNS_15\",[pattern_15])\n",
+        "matcher.add(\"App_TEST_PATTERNS_16\",[pattern_16])"
+      ],
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "vILVIDk4BwAl"
+      },
+      "source": [
+        "class Resume_Extractor:\n",
+        "  doc_list=[]\n",
+        "\n",
+        "  def __init__(self,resumelist):\n",
+        "    \n",
+        "    for resume in resumelist:\n",
+        "      raw = parser.from_file(resume)\n",
+        "      # print(raw['content'])\n",
+        "    \n",
+        "      self.content=raw['content']\n",
+        "      self.doc=nlp(self.content)\n",
+        "\n",
+        "      Resume_Extractor.doc_list.append(self.doc)\n",
+        "\n",
+        "  def __call__(self):\n",
+        "    matches=[]\n",
+        "    for n_doc in Resume_Extractor.doc_list:\n",
+        "      match=matcher(n_doc)\n",
+        "      matches.append(match)\n",
+        "    return matches,Resume_Extractor.doc_list\n",
+        "\n"
+      ],
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "Gc4AXJdqGUQz"
+      },
+      "source": [
+        "resumelist=['My Resume.pdf','sukesh.pdf']\n",
+        "resume_obj=Resume_Extractor(resumelist)\n",
+        "matches,doclist=resume_obj()\n",
+        "# print(Resume_Extractor.doc_list)\n",
+        "# for match_id,pos1,pos2 in matches: \n",
+        "#   print(f'{nlp.vocab.strings[match_id]} : {doc[pos1:pos2].text}')"
+      ],
+      "execution_count": 6,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qjmcs1zhlA2T",
+        "outputId": "9de6e049-4713-41c0-fd23-bbd412b9fd10"
+      },
+      "source": [
+        "matches[:]"
+      ],
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "[[(4745435404383733021, 155, 156),\n",
+              "  (9901177402333046556, 169, 171),\n",
+              "  (5984322998672267423, 172, 174),\n",
+              "  (9901177402333046556, 264, 266),\n",
+              "  (5984322998672267423, 267, 269),\n",
+              "  (4745435404383733021, 273, 274),\n",
+              "  (359768736551579739, 281, 282),\n",
+              "  (9901177402333046556, 316, 318)],\n",
+              " [(9901177402333046556, 249, 251),\n",
+              "  (4745435404383733021, 510, 511),\n",
+              "  (9901177402333046556, 706, 708),\n",
+              "  (7846944258520916448, 749, 750),\n",
+              "  (9901177402333046556, 808, 810),\n",
+              "  (359768736551579739, 911, 912)]]"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LyC51-Lt6EpY",
+        "outputId": "5fb7c6ad-013b-40a0-8fcf-85b175d69e45"
+      },
+      "source": [
+        "len(doclist)"
+      ],
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "bSBOWwcvYK52"
+      },
+      "source": [
+        "import numpy as np \n",
+        "import pandas as pd\n",
+        "\n",
+        "class Feature_Matrix():\n",
+        "  def __init__(self,n_resumes):\n",
+        "    feat={'ML':0,'DL':0,'NLP':0,'BD':0,'RF':0,'CV':0,'frontend':0,'backend':0,'react':0,'javascript':0,\n",
+        "          'HTML':0,'nodejs':0,'kotlin':0,'android':0,'ios':0,'react-native':0,'android studio':0}\n",
+        "    self.feat=feat\n",
+        "    self.n_resumes=n_resumes\n",
+        "    \n",
+        "    self.FM=np.zeros((self.n_resumes,len(self.feat)))\n",
+        "      \n",
+        "      \n",
+        "  def feature_gen(self,matches,doclist):\n",
+        "\n",
+        "    for (i,match),doc in zip(enumerate(matches),doclist):\n",
+        "      print(f'for resume {i} \\n')\n",
+        "      for match_id,pos1,pos2 in match: \n",
+        "          print(f'{nlp.vocab.strings[match_id]} : {doc[pos1:pos2].text}')\n",
+        "\n",
+        "          if doc[pos1:pos2].text.lower() == 'machine learning':\n",
+        "            self.feat['ML']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'nlp':\n",
+        "            self.feat['NLP']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'deep learning':\n",
+        "            self.feat['DL']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'big data':\n",
+        "            self.feat['BD']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'reinforcement learning':\n",
+        "            self.feat['RF']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'CV':\n",
+        "            self.feat['CV']+=1\n",
+        "          \n",
+        "          elif doc[pos1:pos2].text.lower() == 'html':\n",
+        "            self.feat['HTML']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'react':\n",
+        "            self.feat['react']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'javascript':\n",
+        "            self.feat['javascript']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'frontend':\n",
+        "            self.feat['frontend']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'backend':\n",
+        "            self.feat['backend']+=1\n",
+        "            \n",
+        "          elif doc[pos1:pos2].text.lower() == 'nodejs':\n",
+        "            self.feat['nodejs']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'kotlin':\n",
+        "            self.feat['kotlin']+=1   \n",
+        "          \n",
+        "          elif doc[pos1:pos2].text.lower() == 'android':\n",
+        "            self.feat['android']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'android studio':\n",
+        "            self.feat['android studio']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'ios':\n",
+        "            self.feat['ios']+=1\n",
+        "\n",
+        "          elif doc[pos1:pos2].text.lower() == 'react-native':\n",
+        "            self.feat['react-native']+=1\n",
+        "\n",
+        "          else:\n",
+        "            print(f'{doc[pos1:pos2]} has no matches \\n')\n",
+        "\n",
+        "\n",
+        "      for j in range(len(self.feat)):\n",
+        "          if j==0:\n",
+        "            self.FM[i,j]=self.feat['ML']\n",
+        "          elif j==1:\n",
+        "            self.FM[i,j]=self.feat['DL']\n",
+        "          elif j==2:\n",
+        "            self.FM[i,j]=self.feat['NLP']\n",
+        "          elif j==3:\n",
+        "            self.FM[i,j]=self.feat['BD']\n",
+        "          elif j==4:\n",
+        "            self.FM[i,j]=self.feat['RF']\n",
+        "          elif j==5:\n",
+        "            self.FM[i,j]=self.feat['CV']\n",
+        "          elif j==6:\n",
+        "            self.FM[i,j]=self.feat['HTML']\n",
+        "          elif j==7:\n",
+        "            self.FM[i,j]=self.feat['javascript']\n",
+        "          elif j==8:\n",
+        "            self.FM[i,j]=self.feat['backend']\n",
+        "          elif j==9:\n",
+        "            self.FM[i,j]=self.feat['frontend']\n",
+        "          elif j==10:\n",
+        "            self.FM[i,j]=self.feat['react']\n",
+        "          elif j==11:\n",
+        "            self.FM[i,j]=self.feat['nodejs']\n",
+        "          elif j==12:\n",
+        "            self.FM[i,j]=self.feat['kotlin']\n",
+        "          elif j==13:\n",
+        "            self.FM[i,j]==self.feat['android']\n",
+        "          elif j==14:\n",
+        "            self.FM[i,j]=self.feat['ios']\n",
+        "          elif j==15:\n",
+        "            self.FM[i,j]=self.feat['android studio']\n",
+        "          elif j==16:\n",
+        "            self.FM[i,j]=self.feat['react-native']\n",
+        "          else:\n",
+        "            self.FM[i,j]=0\n",
+        "\n",
+        "    return self.FM\n",
+        "\n",
+        "      \n",
+        "  def class_label(self):\n",
+        "      #for AI\n",
+        "      target_data=[]\n",
+        "      ai_score=(self.feat['ML']+self.feat['DL']+self.feat['NLP']+self.feat['BD']+self.feat['RF']+self.feat['CV'])/(sum(self.feat.values()))\n",
+        "\n",
+        "      #for web dev\n",
+        "\n",
+        "      wb_score=(self.feat['frontend']+self.feat['backend']+self.feat['react']+self.feat['javascript']+self.feat['HTML']+self.feat['nodejs'])/(sum(self.feat.values()))\n",
+        "\n",
+        "      #for app dev\n",
+        "\n",
+        "      app_score=(self.feat['kotlin']+self.feat['android']+self.feat['ios']+self.feat['react-native']+self.feat['android studio'])/(sum(self.feat.values()))\n",
+        "      \n",
+        "      if ai_score>wb_score and ai_score>app_score:\n",
+        "        target_data.append('AI developer')\n",
+        "      elif wb_score>ai_score and wb_score>app_score:\n",
+        "        target_data.append('web developer')\n",
+        "      elif app_score>ai_score and app_score>wb_score:\n",
+        "        target_data.append('app developer')\n",
+        "\n",
+        "      \n",
+        "      return target_data\n",
+        "\n",
+        "      "
+      ],
+      "execution_count": 9,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "TG5av_RTgJxz",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "fed708f8-90e3-4df4-f86e-71c339673925"
+      },
+      "source": [
+        "arr_obj=Feature_Matrix(2)\n",
+        "data=arr_obj.feature_gen(matches,doclist)\n"
+      ],
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "for resume 0 \n",
+            "\n",
+            "AI_TEST_PATTERNS_3 : NLP\n",
+            "AI_TEST_PATTERNS_1 : machine learning\n",
+            "AI_TEST_PATTERNS_2 : deep learning\n",
+            "AI_TEST_PATTERNS_1 : Machine learning\n",
+            "AI_TEST_PATTERNS_2 : Deep Learning\n",
+            "AI_TEST_PATTERNS_3 : NLP\n",
+            "wb_TEST_PATTERNS_11 : Backend\n",
+            "AI_TEST_PATTERNS_1 : Machine Learning\n",
+            "for resume 1 \n",
+            "\n",
+            "AI_TEST_PATTERNS_1 : Machine Learning\n",
+            "AI_TEST_PATTERNS_3 : NLP\n",
+            "AI_TEST_PATTERNS_1 : Machine Learning\n",
+            "wb_TEST_PATTERNS_12 : React\n",
+            "AI_TEST_PATTERNS_1 : Machine Learning\n",
+            "wb_TEST_PATTERNS_11 : backend\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "muzbSynf6bm8",
+        "outputId": "acae3d52-c854-4ba5-c3e1-15e6aca65da6"
+      },
+      "source": [
+        "data"
+      ],
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[3., 2., 2., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,\n",
+              "        0.],\n",
+              "       [6., 2., 3., 0., 0., 0., 0., 0., 2., 0., 1., 0., 0., 0., 0., 0.,\n",
+              "        0.]])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "_F2ATrSQXZkX"
+      },
+      "source": [
+        "for i,arr in enumerate(data):\n",
+        "  for j,element in enumerate(arr):\n",
+        "    data[i,j]=element/sum(arr)\n"
+      ],
+      "execution_count": 13,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7pgFXP7macAZ",
+        "outputId": "4ccaafe7-54fb-4c5e-bea5-a060babf6830"
+      },
+      "source": [
+        "arr_obj.class_label()"
+      ],
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['AI developer']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "w1pORlhcaqwJ"
+      },
+      "source": [
+        ""
+      ],
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
