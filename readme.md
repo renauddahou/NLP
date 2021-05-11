@@ -22,4 +22,6 @@
 
 1. Resume parser app (Using information retrieval techniques)
   stacks - Spacy matcher,classification model with bert 
+
+2. Blog Tagger python package
    
