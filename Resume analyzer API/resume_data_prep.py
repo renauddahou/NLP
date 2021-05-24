@@ -23,7 +23,7 @@ class Resume_Extractor:
 
       Resume_Extractor.doc_list.append(self.doc)
 
-  def __call__(self):
+  def __call__(self,matcher):
     matches=[]
     for n_doc in Resume_Extractor.doc_list:
       match=matcher(n_doc)
@@ -267,7 +267,7 @@ class Feature_Matrix():
       return y_data
 
 
-if __name__=='__main__':
+def patterns():
 
   nlp=spacy.load('en_core_web_sm')
   matcher=Matcher(nlp.vocab)
@@ -367,9 +367,15 @@ if __name__=='__main__':
             'frontend':0,'backend':0,'react':0,'javascript':0,'HTML':0,'CSS':0,'nodejs':0,'firebase':0,'GraphQL':0,'SEO':0,
             'kotlin':0,'android':0,'ios':0,'android-sdk':0,'react-native':0,'android studio':0,'dart':0,'android-app':0,'flutter':0}
 
-  resumelist=['sukesh.pdf','arnab deep.pdf','Varun_AndroidDev.pdf']  #examples
+  return features,matcher
+
+
+if __name__=='__main__':
+
+  features,matcher=patterns()
+  resumelist=['Resume data/sukesh.pdf','Resume data/arnab deep.pdf','Resume data/Varun_AndroidDev.pdf']  #examples
   resume_obj=Resume_Extractor(resumelist)
-  matches,doclist=resume_obj()
+  matches,doclist=resume_obj(matcher)
   # print(Resume_Extractor.doc_list)
   # for match_id,pos1,pos2 in matches: 
   #   print(f'{nlp.vocab.strings[match_id]} : {doc[pos1:pos2].text}')
@@ -377,4 +383,8 @@ if __name__=='__main__':
 
   arr_obj=Feature_Matrix(len(resumelist),len(features))
   x_data,y_data=arr_obj.feature_gen(matches,doclist,features)
+
+  print(x_data[:3])
+  print('\n')
+  print(y_data[:3])
 
