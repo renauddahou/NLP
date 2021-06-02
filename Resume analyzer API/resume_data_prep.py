@@ -3,9 +3,10 @@
 ### resume data
 ### Extracting data for hiring a developer 
 
-from spacy.matcher import Matcher
+import numpy as np
 import spacy
-import numpy as np 
+import tika
+from spacy.matcher import Matcher
 from tika import parser
 
 
@@ -13,6 +14,7 @@ class Resume_Extractor:
   doc_list=[]
 
   def __init__(self,resumelist):
+    nlp = spacy.load("en_core_web_sm")
     
     for resume in resumelist:
       raw = parser.from_file(resume)
@@ -36,14 +38,11 @@ class Feature_Matrix():
     FM=np.zeros((n_resumes,n_features))
     self.FM=FM
     
-  def feature_gen(self,matches,doclist):
+  def feature_gen(self,matches,doclist,features):
     best_ai_score,best_wb_score,best_app_score=21,18,15  # best available resume taken for reference point for each domain
     target_data=[]
     for (i,match),doc in zip(enumerate(matches),doclist):
-      feat_c={'ML':0,'DL':0,'NLP':0,'BD':0,'RL':0,'CV':0,'AI':0,'data_science':0,'data_engineer':0,'data_analyst':0,
-            'unsupervised_ML':0,'supervised_ML':0,'NN':0,'data_mining':0,'regression':0,'classification':0,'bayesian':0,
-            'frontend':0,'backend':0,'react':0,'javascript':0,'HTML':0,'CSS':0,'nodejs':0,'firebase':0,'GraphQL':0,'SEO':0,
-            'kotlin':0,'android':0,'ios':0,'android-sdk':0,'react-native':0,'android studio':0,'dart':0,'android-app':0,'flutter':0}  #copy of features
+      feat_c=features.copy()  #copy of features
       print(f'for resume {i} \n')
       for match_id,pos1,pos2 in match: # since doc will never contain an unknown buzz word as spacy matcher has limited matches,therefore else condn is useless here
           # print(f'{nlp.vocab.strings[match_id]} : {doc[pos1:pos2].text}')
@@ -373,7 +372,7 @@ def patterns():
 if __name__=='__main__':
 
   features,matcher=patterns()
-  resumelist=['Resume data/sukesh.pdf','Resume data/arnab deep.pdf','Resume data/Varun_AndroidDev.pdf']  #examples
+  resumelist=['Resume data/My resume optional.pdf']  #examples
   resume_obj=Resume_Extractor(resumelist)
   matches,doclist=resume_obj(matcher)
   # print(Resume_Extractor.doc_list)
@@ -383,8 +382,9 @@ if __name__=='__main__':
 
   arr_obj=Feature_Matrix(len(resumelist),len(features))
   x_data,y_data=arr_obj.feature_gen(matches,doclist,features)
-
-  print(x_data[:3])
+  
+  print(len(features))
+  print(x_data)
   print('\n')
-  print(y_data[:3])
+  print(y_data)
 
