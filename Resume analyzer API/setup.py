@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request
 from spacy.matcher import matcher
 from tika import parser
 
-from resume_data_prep import Feature_Matrix, Resume_Extractor, patterns
+from src.resume_data_prep import Feature_Matrix, Resume_Extractor, patterns
 
 app=Flask(__name__)
 
@@ -29,39 +29,37 @@ def data_prep(resumelist):
 def predict():
     response={}
     y_pred,class_names,scores=[],[],[]
-    resumelist=['Resume data/My resume optional.pdf']
+    resumelist=['Resume data/My resume optional.pdf','Resume data/My Resume.pdf']
     # resumelist=str(input().split())
     x_data,y_data=data_prep(resumelist)
-    with open('normalizer.pkl','rb') as f:
+    with open('assets/normalizer.pkl','rb') as f:
         normalizer=pickle.load(f)
 
     x_data=normalizer.transform(x_data)
     
-    print(x_data)
-    with open('encoder.pkl','rb') as f:
+    with open('assets/encoder.pkl','rb') as f:
         encoder=pickle.load(f)
 
-    with open('classification_model.pkl','rb') as f:
+    with open('models/classification_model.pkl','rb') as f:
         class_model=pickle.load(f)
 
-    with open('regression_model.pkl','rb') as f:
+    with open('models/regression_model.pkl','rb') as f:
         reg_model=pickle.load(f)
 
     
-    
-    if x_data.shape[0]==1:
-        y_pred.append([class_model.predict(x_data),reg_model.predict(x_data)])
-    else:
-        x_data=x_data.reshape(1,-1)
-        y_pred.append([class_model.predict(x_data),reg_model.predict(x_data)])
+    y_pred.append([class_model.predict(x_data),reg_model.predict(x_data)])
+    print(y_pred[0][0])
+    print(np.ravel(y_pred[0][1]))
+    classes=y_pred[0][0]
+    score_val=np.ravel(y_pred[0][1])
 
-    for classes in y_pred:
-        class_names.append(encoder.inverse_transform(classes[0]))
-        scores.append(classes[1])
 
-        
+    for class_val,score in zip(classes,score_val):
+        class_names.append(encoder.inverse_transform([class_val]))
+        scores.append(score)
+
     for name,label,score in zip(resumelist,class_names,scores):
-        response[name] = [str(label[0]),str(scores[0][0]*100)]
+        response[name] = [str(label[0]),str(score*100)]
 
 
     return jsonify(response)

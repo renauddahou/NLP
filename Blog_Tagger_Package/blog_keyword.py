@@ -5,35 +5,18 @@
 """
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-import requests
-from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import CountVectorizer
 import spacy
 from transformers import TFAutoModel,AutoTokenizer
 import tensorflow as tf
 import nltk
 from nltk.corpus import stopwords
+from preprocessing_data import Blog_Data
 
 nltk.download('stopwords')
 
 
-class DATA:
-  def __init__(self,url):
-    _res = requests.get(url)
-    _html_page = _res.content
-    self.soup = BeautifulSoup(_html_page, 'html.parser')
 
-  def text_prep(self,req):
-    text = self.soup.find_all(text=True)
-    # set([t.parent.name for t in text])
-    Text=""
-    for t in text:
-      if t.parent.name in req:
-        Text+=t
-
-    Text=' '.join(Text.split()[:200])
-
-    return Text
 
 # Text = """He’s a very loud and charismatic present Yorker who gained internet fame as the crazy and 
 # outgoing host of Wine Library TV, a video blog that obsessively talked about everything related to wine. 
@@ -43,8 +26,6 @@ class DATA:
 # a very large digital marketing agency that works with some of the largest brands in the world.He’s been 
 # featured in The Wall Street Journal, GQ, and Time Magazine, as well as appeared on Late Night with Conan O’Brien 
 # and The Ellen DeGeneres Show."""
-
-
 """### step 1: candidate selection from text (blog post)
 
 #### Dealing with unigram and bigrams candidate tokens only 
@@ -114,7 +95,7 @@ class Blog_Tagger:
 
 
 if __name__=='__main__':
-  data=DATA("https://pinchofyum.com/black-pepper-stir-fried-udon")
+  data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")
   Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])
   tagger=Blog_Tagger(Text_data)
   model=TFAutoModel.from_pretrained('albert-base-v2')
