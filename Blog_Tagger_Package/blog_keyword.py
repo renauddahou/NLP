@@ -46,9 +46,10 @@ def tokens(Text_data,stop_words):
 
 
 class Blog_Tagger:
-  def __init__(self,Text_data):
-
+  def __init__(self,Text_data,maxlen):
+    
     nlp=spacy.load('en_core_web_sm')
+    Text_data=' '.join(Text_data.split()[:maxlen])
     self.Text_data=Text_data
     self.all_candidate_tokens=tokens(Text_data,stop_words=set(stopwords.words('english')))
     self.doc=nlp(self.Text_data)
@@ -97,11 +98,11 @@ class Blog_Tagger:
 # if __name__=='__main__':
 #   data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")
 #   Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])
-#   tagger=Blog_Tagger(Text_data)
+#   tagger=Blog_Tagger(Text_data,maxlen=<int num>)  #no of strings
 #   model=TFAutoModel.from_pretrained('albert-base-v2')
 #   tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')
 #   tagger.token_embedding_gen(model,tokenizer)
-#   top_tokens=tagger.tag_gen()
+#   top_tokens=tagger.tag_gen(n)
 
 #   print(top_tokens)
 
