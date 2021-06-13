@@ -21,7 +21,6 @@ def process_file(resumelist):
 
     arr_obj=Feature_Matrix(len(resumelist),len(features))
     x_data,y_data=arr_obj.feature_gen(matches,doclist,features)
-    print(x_data)
 
     return x_data,y_data
 
