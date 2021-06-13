@@ -81,29 +81,29 @@ class Blog_Tagger:
   """### Now using candidate embeddings and blog text embeddings we will use similarity measuring metric 
    cosine similarity from sklearn package to decide which tokens are best matched to the blog text"""
 
-  def tag_gen(self):
+  def tag_gen(self,k):
     score={}
     for token,token_embed in self.candidate_token_embeddings.items():
       score[token]=cosine_similarity(np.array(token_embed).reshape(1,-1),np.array(self.blog_text_embedding))[0][0]  #compared to blog_text
 
     k_tag_score=sorted(score)
-    return k_tag_score[-10:-1]
+    return k_tag_score[-k:]
 
 
 
 ## Driver code for testing
 
 
-if __name__=='__main__':
-  data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")
-  Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])
-  tagger=Blog_Tagger(Text_data)
-  model=TFAutoModel.from_pretrained('albert-base-v2')
-  tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')
-  tagger.token_embedding_gen(model,tokenizer)
-  top_tokens=tagger.tag_gen()
+# if __name__=='__main__':
+#   data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")
+#   Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])
+#   tagger=Blog_Tagger(Text_data)
+#   model=TFAutoModel.from_pretrained('albert-base-v2')
+#   tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')
+#   tagger.token_embedding_gen(model,tokenizer)
+#   top_tokens=tagger.tag_gen()
 
-  print(top_tokens)
+#   print(top_tokens)
 
 
 
