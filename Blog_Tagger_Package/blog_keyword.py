@@ -11,21 +11,11 @@ from transformers import TFAutoModel,AutoTokenizer
 import tensorflow as tf
 import nltk
 from nltk.corpus import stopwords
-from preprocessing_data import Blog_Data
+from web_data import Blog_Data
 
 nltk.download('stopwords')
 
 
-
-
-# Text = """He’s a very loud and charismatic present Yorker who gained internet fame as the crazy and 
-# outgoing host of Wine Library TV, a video blog that obsessively talked about everything related to wine. 
-# Through online video blogging, he built his wine business from a $3-million-dollar-a-year wine retail 
-# store to a $60 million dollar wine wholesale business.Gary Vaynerchuk has built a multi-million dollar 
-# empire relating to his personal brand. He’s a two-time best-selling author and co-founder of Vayner Media, 
-# a very large digital marketing agency that works with some of the largest brands in the world.He’s been 
-# featured in The Wall Street Journal, GQ, and Time Magazine, as well as appeared on Late Night with Conan O’Brien 
-# and The Ellen DeGeneres Show."""
 """### step 1: candidate selection from text (blog post)
 
 #### Dealing with unigram and bigrams candidate tokens only 
