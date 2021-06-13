@@ -3,11 +3,9 @@ import pickle
 
 import os
 import numpy as np
-from flask import Flask, jsonify, request
-from spacy.matcher import matcher
-from tika import parser
+from flask import jsonify
 from src.source import Feature_Matrix, Resume_Extractor, patterns
-from flask import Flask, request, redirect, url_for, render_template, send_from_directory
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 
 app=Flask(__name__, template_folder='template')
@@ -43,7 +41,6 @@ def index():
 def upload_file():
     
     f = request.files['file']
-    print(f)
     f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
 
     return 'file uploaded successfully'
@@ -52,7 +49,7 @@ def upload_file():
 
 
 
-@app.route("/predict",methods=['GET','POST'])
+@app.route("/predict",methods=['GET'])
 def predict():
     response={}
     resumelist=[os.path.join(UPLOAD_FOLDER,file) for file in os.listdir(UPLOAD_FOLDER)]
