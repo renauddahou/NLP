@@ -43,7 +43,6 @@ def index():
 def upload_file():
     
     f = request.files['file']
-    print(f)
     f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
 
     return 'file uploaded successfully'
@@ -52,7 +51,7 @@ def upload_file():
 
 
 
-@app.route("/predict",methods=['GET','POST'])
+@app.route("/predict",methods=['GET'])
 def predict():
     response={}
     resumelist=[os.path.join(UPLOAD_FOLDER,file) for file in os.listdir(UPLOAD_FOLDER)]
