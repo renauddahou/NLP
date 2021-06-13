@@ -1,37 +1,66 @@
+
 import pickle
 
-import flask
+import os
 import numpy as np
 from flask import Flask, jsonify, request
 from spacy.matcher import matcher
 from tika import parser
+from src.source import Feature_Matrix, Resume_Extractor, patterns
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory
+from werkzeug.utils import secure_filename
 
-from src.resume_data_prep import Feature_Matrix, Resume_Extractor, patterns
-
-app=Flask(__name__)
+app=Flask(__name__, template_folder='template')
 
 
-def data_prep(resumelist):
+def process_file(resumelist):
     features,matcher=patterns()  #examples
     resume_obj=Resume_Extractor(resumelist)
     matches,doclist=resume_obj(matcher)
-    # print(Resume_Extractor.doc_list)
-    # for match_id,pos1,pos2 in matches: 
-    #   print(f'{nlp.vocab.strings[match_id]} : {doc[pos1:pos2].text}')
 
 
     arr_obj=Feature_Matrix(len(resumelist),len(features))
     x_data,y_data=arr_obj.feature_gen(matches,doclist,features)
+    print(x_data)
 
     return x_data,y_data
 
-@app.route("/predict",methods=["POST","GET"])
+
+UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__)) + '/uploads/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+# ALLOWED_EXTENSIONS = {'pdf'}
+# def allowed_file(filename):
+#    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
+@app.route('/',methods=['GET','POST'])
+def index():
+    return render_template('index.html')
+
+@app.route('/uploader',methods=['POST'])
+def upload_file():
+    
+    f = request.files['file']
+    print(f)
+    f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+
+    return 'file uploaded successfully'
+
+
+
+
+
+@app.route("/predict",methods=['GET','POST'])
 def predict():
     response={}
+    resumelist=[os.path.join(UPLOAD_FOLDER,file) for file in os.listdir(UPLOAD_FOLDER)]
+    print(resumelist)
+    x_data,y_data=process_file(resumelist)
+
     y_pred,class_names,scores=[],[],[]
-    resumelist=['Resume data/My resume optional.pdf','Resume data/My Resume.pdf']
-    # resumelist=str(input().split())
-    x_data,y_data=data_prep(resumelist)
     with open('assets/normalizer.pkl','rb') as f:
         normalizer=pickle.load(f)
 
@@ -48,8 +77,6 @@ def predict():
 
     
     y_pred.append([class_model.predict(x_data),reg_model.predict(x_data)])
-    print(y_pred[0][0])
-    print(np.ravel(y_pred[0][1]))
     classes=y_pred[0][0]
     score_val=np.ravel(y_pred[0][1])
 
