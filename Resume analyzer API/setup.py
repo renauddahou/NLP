@@ -41,7 +41,7 @@ def index():
 def upload_file():
     
     f = request.files['file']
-    f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+    f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename,)))
 
     return 'file uploaded successfully'
 
@@ -53,7 +53,6 @@ def upload_file():
 def predict():
     response={}
     resumelist=[os.path.join(UPLOAD_FOLDER,file) for file in os.listdir(UPLOAD_FOLDER)]
-    print(resumelist)
     x_data,y_data=process_file(resumelist)
 
     y_pred,class_names,scores=[],[],[]
