@@ -41,7 +41,7 @@ def index():
 def upload_file():
     
     f = request.files['file']
-    f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename,)))
+    f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
 
     return 'file uploaded successfully'
 
@@ -89,7 +89,7 @@ def predict():
     
 
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(debug=False)
 
 
 
