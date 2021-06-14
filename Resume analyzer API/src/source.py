@@ -243,7 +243,7 @@ class Feature_Matrix():
       y_data=[]
       ai_score=(feat_c['ML']+feat_c['DL']+feat_c['NLP']+feat_c['BD']+feat_c['RL']+feat_c['CV']+feat_c['AI']+feat_c['data_engineer']+feat_c['data_science']+
                 feat_c['data_analyst']+feat_c['unsupervised_ML']+feat_c['supervised_ML']+feat_c['NN']+feat_c['data_mining']+feat_c['regression']+
-                feat_c['classification']+feat_c['bayesian'])/best_ai_score       #Rajvardhan ook's resume is the reference
+                feat_c['classification']+feat_c['bayesian'])/best_ai_score       
 
       #for web unjuk
 
