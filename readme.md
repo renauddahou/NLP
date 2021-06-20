@@ -1,4 +1,4 @@
-# Basic NLP tasks
+# NLP tasks
 
 1. Sentiment Analysis (multilingual and monolingual)
 2. Machine Translation
