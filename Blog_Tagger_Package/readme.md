@@ -4,10 +4,12 @@ This Package can be used to extract keywords from a page to create tags for any 
 These tags highlights the topic content by providing a glance of large volume of texts embedded in a page.Tag generation is an important feature
 in many sectors of IT such as Amazon uses tags for customer segmentation.
 
-Prerequisites:
+## Prerequisites:
 
-Install transformer model.for best use case intstall Albert model ,you might change the model but it might need customization in source code.so albert
-model is adviced to download.
+Installed transformer model.<br>
+
+Follow the instruction given below to install albert-base model ,you can change the model but it might need some customization in source code. so albert
+model is adviced here to download.
 
 `model=TFAutoModel.from_pretrained('albert-base-v2')` <br>
 `tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')` <br>
