@@ -8,8 +8,8 @@ in many sectors of IT such as Amazon uses tags for customer segmentation.
 
 Installed transformer model.<br>
 
-Follow the instruction given below to install albert-base model ,you can change the model but it might need some customization in source code. so albert
-model is adviced here to download.
+Follow the instruction given below to install albert-base model ,you can change the model but it might need some customization in source code. 
+so albert model is adviced here to download.
 
 `model=TFAutoModel.from_pretrained('albert-base-v2')` <br>
 `tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')` <br>
@@ -18,7 +18,9 @@ model is adviced here to download.
 
 ## Usage Instructions
 
-1. collect web data <br>
+1. Clone the repository on local system 
+
+2. Collect web data <br>
 
 - For example <br>
 
@@ -26,7 +28,7 @@ model is adviced here to download.
   `data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")` pass website <br>
   `Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])` pass tags <br>
 
-2. Use main class Blog tagger to generate top k tags. <br>
+3. Use main class Blog tagger to generate top k tags. <br>
 
 - For example <br>
 
