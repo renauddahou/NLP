@@ -4,10 +4,12 @@ This Package can be used to extract keywords from a page to create tags for any 
 These tags highlights the topic content by providing a glance of large volume of texts embedded in a page.Tag generation is an important feature
 in many sectors of IT such as Amazon uses tags for customer segmentation.
 
-Prerequisites:
+## Prerequisites:
 
-Install transformer model.for best use case intstall Albert model ,you might change the model but it might need customization in source code.so albert
-model is adviced to download.
+Installed transformer model.<br>
+
+Follow the instruction given below to install albert-base model ,you can change the model but it might need some customization in source code. 
+so albert model is adviced here to download.
 
 `model=TFAutoModel.from_pretrained('albert-base-v2')` <br>
 `tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')` <br>
@@ -16,7 +18,9 @@ model is adviced to download.
 
 ## Usage Instructions
 
-1. collect web data <br>
+1. Clone the repository on local system 
+
+2. Collect web data <br>
 
 - For example <br>
 
@@ -24,7 +28,7 @@ model is adviced to download.
   `data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")` pass website <br>
   `Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])` pass tags <br>
 
-2. Use main class Blog tagger to generate top k tags. <br>
+3. Use main class Blog tagger to generate top k tags. <br>
 
 - For example <br>
 
