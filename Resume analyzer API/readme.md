@@ -1,6 +1,7 @@
 # Resume Analyzer v1.0
 
-A resume analyzer which scores your resume profile based on keywords and classifies the domain of resume holder. It currently supports limited domain classification of resume holder (App developer, AI Developer, Web developer).
+A resume analyzer which scores your resume profile based on keywords and classifies the domain of resume holder. It currently supports limited domain classification of resume holder (App developer, AI Developer, Web developer).                              
+`Scores out of 100`
 <br>
 <br>
 Currently in continous development phase <br>
