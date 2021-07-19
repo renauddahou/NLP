@@ -10,6 +10,7 @@ import spacy
 from transformers import TFAutoModel,AutoTokenizer
 import tensorflow as tf
 import nltk
+from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from web_data import Blog_Data
 
@@ -77,8 +78,8 @@ class Blog_Tagger:
     for token,token_embed in self.candidate_token_embeddings.items():
       score[token]=cosine_similarity(np.array(token_embed).reshape(1,-1),np.array(self.blog_text_embedding))[0][0]  #compared to blog_text
 
-    k_tag_score=sorted(score)
-    return k_tag_score[-k:]
+    k_tags=sorted(score,reverse=True,key=lambda item : item[1])
+    return k_tags[:k]
 
 
 
@@ -86,6 +87,7 @@ class Blog_Tagger:
 
 
 # if __name__=='__main__':
+#   lemmatizer=WordNetLemmatizer()
 #   data=Blog_Data("https://influencermarketinghub.com/12-best-food-blogs/")
 #   Text_data=data.text_prep(req=['h1', 'h2', 'h3', 'h4', 'p'])
 #   tagger=Blog_Tagger(Text_data,maxlen=<int num>)  #no of strings
@@ -93,8 +95,8 @@ class Blog_Tagger:
 #   tokenizer=AutoTokenizer.from_pretrained('albert-base-v2')
 #   tagger.token_embedding_gen(model,tokenizer)
 #   top_tokens=tagger.tag_gen(n)
-
-#   print(top_tokens)
+#   unique_top_tokens=np.unique([lemmatizer.lemmatize(word) for word in top_tokens])
+#   print(unique_top_tokens)
 
 
 
